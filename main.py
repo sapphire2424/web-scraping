@@ -1,25 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://example.com"  # 任意のURLに変更
+def fetch_and_save_html(url, filename):
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+        html = str(soup)
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"HTMLを {filename} に保存しました。")
+    except Exception as e:
+        print(f"エラーが発生しました: {e}")
 
-# HTMLを取得
-try:
-    response = requests.get(url)
-except requests.exceptions.RequestException as e:
-    print(f"Error fetching the URL: {e}")
-    exit()
-try:
-    soup = BeautifulSoup(response.content, "html.parser")
-except Exception as e:
-    print(f"Error parsing HTML: {e}")
-    exit()
-# HTML全体を文字列として取得
-html_all = str(soup)
-
-# または整形して取得
-html_all_prettified = soup.prettify()
-
-# ファイルに保存
-with open("output.html", "w", encoding="utf-8") as f:
-    f.write(html_all)
+if __name__ == "__main__":
+    url = "https://example.com"  # 取得したいWebサイトのURLを指定
+    fetch_and_save_html(url, "output.html")
