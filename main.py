@@ -1,25 +1,63 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
+import json
 
-url = "https://google.com/"  # 適宜変更
+def fetch_page(url, timeout=10):
+    try:
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        return response.content
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTPエラー: {http_err}")
+    except requests.exceptions.ConnectionError as conn_err:
+        print(f"接続エラー: {conn_err}")
+    except requests.exceptions.Timeout:
+        print("タイムアウトエラー")
+    except requests.exceptions.RequestException as req_err:
+        print(f"リクエストエラー: {req_err}")
+    except Exception as e:
+        print(f"予期せぬエラー: {e}")
+    return None
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
-}
+def parse_data(html):
+    try:
+        soup = BeautifulSoup(html, 'html.parser')
+        # ここで抽出したいデータのロジックを記述
+        # 例: タイトルと本文を抽出
+        data = []
+        for item in soup.find_all('h2'):  # 適宜タグやclass名を変更
+            text = item.get_text(strip=True)
+            data.append([text])
+        return data
+    except AttributeError:
+        print('必要な要素が見つかりません。HTML構造が変わった可能性があります。')
+    except Exception as e:
+        print(f"パース中のエラー: {e}")
+    return []
 
-try:
-    response = requests.get(url, headers=headers, timeout=10)
-    response.raise_for_status()  # HTTPエラーを例外として扱う
-    soup = BeautifulSoup(response.content, 'html.parser')
-except requests.exceptions.RequestException as e:
-    print(f"データ取得中にエラーが発生しました({url}): {e}")
-    exit()
+def save_to_csv(data, filename):
+    try:
+        with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerows(data)
+        print(f"CSVファイルとして保存しました: {filename}")
+    except Exception as e:
+        print(f"CSV保存時のエラー: {e}")
 
-# 例: タイトルだけ抽出して保存
-title = soup.title.string if soup.title else "No Title"
+def save_to_json(data, filename):
+    try:
+        with open(filename, 'w', encoding='utf-8') as jsonfile:
+            json.dump(data, jsonfile, ensure_ascii=False, indent=4)
+        print(f"JSONファイルとして保存しました: {filename}")
+    except Exception as e:
+        print(f"JSON保存時のエラー: {e}")
 
-try:
-    with open("data.txt", "w", encoding="utf-8") as f:
-        f.write(title)
-except Exception as e:
-    print(f"ファイル保存中にエラーが発生しました: {e}")
+if __name__ == "__main__":
+    url = "https://example.com"  # ここを取得対象のURLに変更
+    html = fetch_page(url)
+    if html:
+        data = parse_data(html)
+        if data:
+            save_to_csv(data, 'scraped_data.csv')
+            save_to_json(data, 'scraped_data.json')
