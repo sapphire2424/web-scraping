@@ -10,6 +10,7 @@ try:
     soup = BeautifulSoup(response.content, 'html.parser')
 except requests.exceptions.RequestException as e:
     print(f"データ取得中にエラーが発生しました( {url} ): {e}")
+    exit()
 
 #保存先のファイルを作成
 f = open("data.txt", "w", encoding="utf-8")
