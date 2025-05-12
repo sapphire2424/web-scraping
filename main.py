@@ -1,9 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://example.com"  # ”CˆÓ‚ÌURL‚É•ÏX
+url = "https://example.com"  # ä»»æ„ã®URLã«å¤‰æ›´
 
-# HTML‚ğæ“¾
+# HTMLã‚’å–å¾—
 try:
     response = requests.get(url)
 except requests.exceptions.RequestException as e:
@@ -13,13 +13,13 @@ try:
     soup = BeautifulSoup(response.content, "html.parser")
 except Exception as e:
     print(f"Error parsing HTML: {e}")
-
-# HTML‘S‘Ì‚ğ•¶š—ñ‚Æ‚µ‚Äæ“¾
+    exit()
+# HTMLå…¨ä½“ã‚’æ–‡å­—åˆ—ã¨ã—ã¦å–å¾—
 html_all = str(soup)
 
-# ‚Ü‚½‚Í®Œ`‚µ‚Äæ“¾
+# ã¾ãŸã¯æ•´å½¢ã—ã¦å–å¾—
 html_all_prettified = soup.prettify()
 
-# ƒtƒ@ƒCƒ‹‚É•Û‘¶
+# ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜
 with open("output.html", "w", encoding="utf-8") as f:
     f.write(html_all)
